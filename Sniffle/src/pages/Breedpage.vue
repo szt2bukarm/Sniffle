@@ -14,8 +14,7 @@ onMounted(() => {
         <div class="page--header-gradient"></div>
     </div>
     <div class="breeds container">
-        <div class="breeds--heading">Let's see which breed suits you the best.</div>
-        
+        <p class="section-text">Let's see which breed suits you the best.</p>
         <BreedCards />
     </div>
 </template>

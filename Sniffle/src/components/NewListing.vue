@@ -373,11 +373,9 @@ const publishListing = async function() {
                 <button class="new-listing--success-btn" @click="emitter.emit('closeModal')">See my listings</button>
             </div>
         </div>
-
-
-
-
         </div>
+
+
         <div class="new-listing--buttons" v-if="currentSlide != 7">
             <button :disabled="currentSlide === 0" class="new-listing--btn" @click="currentSlide--; nextButtonChecker()">&lt; Prev step</button>
             <button v-if="currentSlide != 6" :disabled="!allowNext" class="new-listing--btn" @click="currentSlide++; nextButtonChecker()">Next step &gt;</button>

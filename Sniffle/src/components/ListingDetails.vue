@@ -123,10 +123,6 @@ const textIsOverflowing = function() {
 <style lang='scss'>
 
 .listing-details{
-    // display: flex;
-    // flex-direction: column;
-    // gap: 5rem;
-    // height: 200vh;
     margin-bottom: 15rem;
 
     &--text{

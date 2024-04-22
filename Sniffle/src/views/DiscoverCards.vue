@@ -30,7 +30,7 @@ const getListings = async () => {
 
 <template>
     <div class="discover discover-container">
-        <h1 class="discover--heading">Let's find you a friend.</h1>
+        <h1 class="section-text">Let's find you a friend.</h1>
         <div class="discover--cards">
             <loaderblock v-if="!listingsLoaded" />
             <listingCard v-for="listing in listings" @click="$router.push(`/listing/${listing._id}`)" :key="listing._id" :data="listing" />
@@ -46,7 +46,7 @@ const getListings = async () => {
     &--cards{
         display: flex;
         flex-wrap: wrap;
-        min-height: 20rem;
+        min-height: 40rem;
         width: 100%;
     }
 

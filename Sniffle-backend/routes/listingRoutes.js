@@ -7,7 +7,7 @@ const multer = require('multer');
 const router = express.Router();
 
 router.get('/byBreedId/:id',listingController.getListingsByBreed)
-
+router.get('/randomListings',listingController.getRandomListings)
 router
     .route('/')
     .get(listingController.getAllListings)

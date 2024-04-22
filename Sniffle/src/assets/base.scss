@@ -171,11 +171,57 @@ html{
 
 .container{
     max-width: 160rem;
-    margin: 0 auto;
+    margin-inline: auto;
     padding: 0 2rem;
 }
 
 button:disabled{
     opacity: .5;
     pointer-events: none;
+}
+
+// typography
+
+.section{
+    &--listings{
+        display: flex;
+        flex-wrap: wrap;
+        margin-bottom: 5rem;
+        min-height: 20rem;
+
+        &-empty{
+            width: 100%;
+            height: 15rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 2rem;
+            font-size: var(--heading5);
+
+            &-icon{
+                font-size: 5rem;
+            }
+        }
+
+    }
+    
+    &-text{
+        max-width: 160rem;
+        margin-inline: auto;
+        margin-top: 7rem;
+        margin-bottom: 2rem;
+        font-family: BerlinBold;
+        font-weight: 600;
+        font-size: var(--heading2);
+        letter-spacing: -1.5px;
+
+        &-mt15{
+            margin-top: 15rem;
+        }
+
+        &-mt5{
+            margin-top: 5rem;
+        }
+    }
 }

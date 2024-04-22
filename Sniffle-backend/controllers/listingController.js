@@ -88,6 +88,56 @@ exports.getListingsByBreed = catchAsync(async (req,res,next) => {
     });
 })
 
+exports.getRandomListings = catchAsync(async (req,res,next) => {
+    const doc = await Listing.aggregate([
+        { $sample: { size: 5 } },
+        {
+            $lookup: {
+                from: 'users',
+                localField: 'user',
+                foreignField: '_id',
+                as: 'user',
+                pipeline: [
+                    {
+                        $project: {
+                            name: 1
+                        }
+                    }
+                ]
+            },
+        },
+        {
+            $unwind: '$user'
+        },
+        {
+            $lookup: {
+                from: 'breeds',
+                localField: 'breed',
+                foreignField: '_id',
+                as: 'breed',
+                pipeline: [
+                    {
+                        $project: {
+                            name: 1
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            $unwind: '$breed'
+        }
+    ])
+    
+    res.status(200).json({
+        status: 'success',
+        results: doc.length,
+        data: {
+        doc
+        }
+    });
+})
+
 exports.getAllListings = factory.getAll(Listing)
 exports.getListing = factory.getOne(Listing)
 exports.updateListing = factory.updateOne(Listing)

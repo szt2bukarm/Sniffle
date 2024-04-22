@@ -1,9 +1,18 @@
 <script setup>
+import { onMounted } from 'vue';
+
+
+const props = defineProps({
+    heigth: Number
+})
+
+onMounted(() => console.log(props.heigth))
+
 </script>
 
 <template>
 
-    <div class="loaderblock-wrapper">
+    <div class="loaderblock-wrapper" :style="{ height: `${props.heigth}rem` }">
         <ion-icon class="loaderblock" name="paw"></ion-icon>
     </div>
 
@@ -17,7 +26,6 @@
         align-items: center;
         justify-content: center;
         width: 100%;
-        height: 20rem;
         background-color: #00000030;
         border-radius: 2rem;
         transition: 200ms;

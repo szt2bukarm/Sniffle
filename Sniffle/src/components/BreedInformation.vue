@@ -2,17 +2,18 @@
 import router from '@/router';
 
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faDog, faWeightScale,faCake } from '@fortawesome/free-solid-svg-icons';
+import { faDog, faWeightScale,faCake,faFaceFrown } from '@fortawesome/free-solid-svg-icons';
 
 import { API_LINK } from '@/utils/config';
 import { hideLoader, showLoader } from '@/utils/helper';
-import 'vue3-carousel/dist/carousel.css'
-import { Carousel, Slide, Pagination, Navigation } from 'vue3-carousel'
 import { onBeforeUnmount, onMounted,ref,inject } from 'vue';
 import { useRoute } from 'vue-router';
 import ImageList from './ImageList.vue';
+import ListingCard from './ListingCard.vue';
+import LoaderBlock from './LoaderBlock.vue';
 
-const breedData = ref([])
+const breedData = ref([]);
+const breedListings = ref([]);
 const imageWrapper = ref(null);
 const description = ref(null);
 const descOverflowing = ref(false);
@@ -44,7 +45,7 @@ onMounted(async () => {
             textIsOverflowing()
         }, 1);
         hideLoader()
-
+        await getListingByBreed()
 })
 
 onBeforeUnmount(() => {
@@ -84,14 +85,25 @@ const getSliderInner = (score) => {
         return 'breed-information--statics-level5'
 }}
 
+const breedListingsLoaded = ref(false);
+const getListingByBreed = async function() {
+    showLoader()
+    const resp = await fetch(`http://localhost:3000/api/listings/byBreedId/${route.params.id}`, {
+        method: 'GET',
+    })
+    const data = await resp.json()
+    console.log(data);
+
+    breedListings.value = data.data.doc
+    breedListingsLoaded.value = true
+    hideLoader()
+}
+
 
 </script>
 
 <template>
-    <div class="page--header">
-        <img src="../images/headers/breed.png" alt="">
-        <div class="page--header-gradient"></div>
-    </div>
+
 
     <div class="breed-information container">
         <div class="breed-information--info-header">
@@ -154,14 +166,17 @@ const getSliderInner = (score) => {
 
         </div>
 
-        <!-- <div class="popup" :class="{ 'popup-open': descPopup }">
-            <div class="popup-item breed-information-popup">
-                <ion-icon name="close-outline" class="popup-close" @click="descPopup = false"></ion-icon>
-                <div class="breed-information-popup-text">
-                    {{ breedData.description }}
+        <div v-if="route.name === 'breed'">
+            <p class="section-text">Find {{ breedData.name }}s</p>
+            <div class="section--listings">
+                <LoaderBlock :height=20 v-if="!breedListingsLoaded"></LoaderBlock>
+                <ListingCard @click="router.push(`/listing/${item._id}`)" v-for="item in breedListings" :key="item.id" :data="item" />
+                <div class="section--listings-empty" v-if="breedListingsLoaded && breedListings.length == 0">
+                    <FontAwesomeIcon class="section--listings-empty-icon" :icon="faFaceFrown"></FontAwesomeIcon>
+                    <p>We couldn't find any listings for this breed.</p>
                 </div>
             </div>
-        </div> -->
+        </div>
     </div>
 </template>
 

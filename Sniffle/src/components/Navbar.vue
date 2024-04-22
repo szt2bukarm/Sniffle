@@ -3,14 +3,25 @@ import { onMounted,ref,inject } from 'vue';
 import { useUserState } from '@/stores/userState';
 import router from '@/router';
 import { useRoute } from 'vue-router';
+import searchbox from './SearchBox.vue';
 const userState = useUserState();
 const userOptions = ref(false);
 const shrinkedNav = ref(false);
+const searchFocused = ref(false);
 const emitter = inject('emitter');
 const route = useRoute();
-window.addEventListener('scroll', () => {
-    scrollY > 50 ? shrinkedNav.value = true : shrinkedNav.value = false
-})
+
+const checkNavScroll = function() {
+    if (scrollY > 50) {
+        shrinkedNav.value = true
+    } else {
+        shrinkedNav.value = false
+    }
+}
+
+
+window.addEventListener('scroll', checkNavScroll)
+
 
 const logOut = function() {
     document.cookie = "jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
@@ -23,28 +34,46 @@ const logOut = function() {
 
 const returnHome = function() {
     if(route.name == 'home') return
-    // console.log();
     window.scrollTo(0,0)
     router.push('/')
 }
 
 
+const expandSearch = function() {
+    searchFocused.value = true;
+    shrinkedNav.value = true
+    window.removeEventListener('scroll', checkNavScroll)
+}
+
+const shrinkSearch = function() {
+    searchFocused.value = false;
+    scrollY > 50 ? shrinkedNav.value = true : shrinkedNav.value = false
+    window.addEventListener('scroll', checkNavScroll)
+}
 
 
 </script>
 
 <template>
     <div class="navbar" :class="{ 'navbar--shrinked': shrinkedNav }">
-        <img @click="returnHome" src="../images/logo.png" class="navbar--logo" :class="{ 'navbar--shrinked--logo': shrinkedNav }">
+        <img @click="returnHome" style="z-index: -2;" src="../images/logo.png" class="navbar--logo" :class="{ 'navbar--shrinked--logo': shrinkedNav }">
         <div class="navbar--search" :class="{ 'navbar--shrinked--search': shrinkedNav }">
-            <input :class="{ 'navbar--shrinked--search__input': shrinkedNav }" type="text" class="navbar--search__input" placeholder="Find your new best friend..." >
+            <input @click="expandSearch" :class="{ 'navbar--shrinked--search__input': shrinkedNav }" type="text" class="navbar--search__input" placeholder="Find your new best friend..." >
             <ion-icon class="navbar--search__input-icon" name="search"></ion-icon>
+            <transition name="fade" mode="out-in">
+                <div v-if="searchFocused" :key="searchFocused">
+                    <div class="navbar--overlay" @click="shrinkSearch"></div>
+                    <div class="navbar--search__box">
+                        <searchbox />
+                    </div>
+                </div>
+            </transition>
         </div>
-        <button v-if="!userState.isLoggedIn" @click="emitter.emit('signup')" class="navbar--profile-login" :class="{ 'navbar--shrinked--cta': shrinkedNav }">
+        <button v-if="!userState.isLoggedIn" style="z-index: -2;" @click="emitter.emit('signup')" class="navbar--profile-login" :class="{ 'navbar--shrinked--cta': shrinkedNav }">
             <ion-icon class="navbar--profile-icon" name="person"></ion-icon>
             Sign up
         </button>
-        <div v-else class="navbar--profile-loggedin-wrapper">
+        <div v-else style="z-index: -2;" class="navbar--profile-loggedin-wrapper">
             <button @click="userOptions = !userOptions" class="navbar--profile-loggedin" :class="{ 'navbar--shrinked--cta': shrinkedNav }">
             <ion-icon class="navbar--profile-arrow" name="chevron-down" :style="{ transform: userOptions ? 'rotate(180deg)' : 'rotate(0deg)' }"></ion-icon>
             <div class="navbar--profile-loggedin-image-wrapper">
@@ -68,6 +97,15 @@ const returnHome = function() {
 
 <style lang='scss'>
 
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 100ms;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
 .navbar{
     display: flex;
     height: 20rem;
@@ -81,6 +119,16 @@ const returnHome = function() {
         padding: 2rem 5%;
     }
 
+    &--overlay{
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        opacity: 1;
+        background-color: #00000050;
+        z-index: -1;
+    }
 
     &--logo{
         width: 20%;
@@ -90,7 +138,7 @@ const returnHome = function() {
 
     &--search{
         position: relative;
-        width: 50%;
+        width: 50rem;
         transition: 200ms;
         margin-inline: auto;
 
@@ -102,6 +150,7 @@ const returnHome = function() {
             border: 0;
             padding: 2rem;
             transition: 200ms;
+            z-index: 99;
 
             &-icon{
                 position: absolute;
@@ -112,10 +161,30 @@ const returnHome = function() {
                 font-size: 2rem;
             }
         }
+
+        &__box{
+            position: absolute;
+            top: 0;
+            // opacity: 0;
+            width: 100%;
+            height: 0;
+            background-color: #fff;
+            box-shadow: 0 0 3rem rgba(0, 0, 0, 0.2);
+            border-radius: 2rem;
+            z-index: -1;
+            animation: showBox 200ms forwards 100ms;
+            overflow-y: hidden;
+
+            @keyframes showBox {
+                to{
+                    height: 40rem;
+                }
+            }
+        }
     }
 
     &--profile{
-
+        
         &-login{
             display: flex;
             justify-content: space-between;
@@ -250,7 +319,7 @@ const returnHome = function() {
     }
 
     &--search{
-        width: 40%;
+        width: 65rem;
 
         &__input{
         height: 4rem;
